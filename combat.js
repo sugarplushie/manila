@@ -217,9 +217,6 @@ function checkForTargets() {
     } else if (bot.state === 'combat') {
         bot.state = 'idle'
         bot.substate = 'none'
-        const entity = bot.nearestEntity()
-
-        bot.lookAt(entity.position.offset(0, entity.height, 0))
 
         if (isShieldActive) {
             isShieldActive = false
