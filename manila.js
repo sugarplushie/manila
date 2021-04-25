@@ -1,5 +1,4 @@
 const mineflayer = require('mineflayer')
-const pvp = require('mineflayer-pvp').plugin
 const armorManager = require('mineflayer-armor-manager')
 
 let bot
@@ -7,6 +6,7 @@ let bot
 const movement = require('./movement')
 const combat = require('./combat')
 const convention = require('./convention')
+const blockfinder = require('./blockfinder')
 
 function createBot(options) {
     // Logging in
@@ -17,7 +17,6 @@ function createBot(options) {
 
     // Loading plugins
     bot.loadPlugin(armorManager)
-    bot.loadPlugin(pvp)
 
     // Applying listeners
     bot.on('physicTick', onTick)
@@ -26,6 +25,7 @@ function createBot(options) {
     movement.load(bot)
     combat.load(bot)
     convention.load(bot)
+    blockfinder.load(bot)
 
     return bot
 }

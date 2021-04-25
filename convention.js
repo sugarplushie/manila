@@ -7,6 +7,7 @@ function load(botclass) {
     bot.eat = eat
     bot.getPlayer = getPlayer
     bot.mountNearest = mountNearest
+    bot.locateBlock = locateBlock
 }
 
 // Eating
@@ -84,6 +85,20 @@ function getPlayer(username) {
     return null
 }
 
+function locateBlock(name) {
+    /*
+    Returns position for the nearest
+    block of that kind
+    */
+    blocks = bot.findBlockSync({
+        point: bot.entity.position,
+        matching: name,
+        maxDistance: 128,
+        count: 1
+    })
+    if (blocks.length > 0) return blocks[0].position
+    return null
+}
 // Vehicle
 // TODO: Vehicle movement
 
