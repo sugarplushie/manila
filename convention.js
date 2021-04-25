@@ -3,11 +3,16 @@ let bot
 function load(botclass) {
     bot = botclass
 
+    bot.on('physicTick', miningTick)
+
     bot.hasFood = hasFood
     bot.eat = eat
     bot.getPlayer = getPlayer
     bot.mountNearest = mountNearest
     bot.locateBlock = locateBlock
+    bot.mineBlock = mineBlock
+    bot.mineBlockAt = mineBlockAt
+    bot.stopMining = stopMining
 }
 
 // Eating
@@ -99,6 +104,65 @@ function locateBlock(name) {
     if (blocks.length > 0) return blocks[0].position
     return null
 }
+
+var mining = false
+var miningCount = 0
+var miningName = null
+
+function miningTick() {
+    if (mining && !bot.targetDigBlock && bot.entity.position.distanceTo(mining) < 2) {
+        bot.lookAt(mining)
+        bot.stopMoving()
+        target = bot.blockAt(mining)
+        function finishedMining(err) {
+            if (err) {
+                //bot.stopDigging()
+                //console.log(err.stack)
+            }
+            //bot.stopDigging()
+            mining = false
+            miningCount -= 1
+            if (miningCount == 0) bot.chat(`Finished mining ${miningName}`)
+            //mineBlockAt()
+        }
+        bot.substate = 'digging'
+        bot.tool.equipForBlock(target, {}, () => { bot.dig(target, finishedMining) })
+    }
+    else if (!mining && miningName && miningCount > 0) {
+        position = bot.locateBlock(miningName)
+        if (position) {
+            bot.mineBlockAt(position)
+        }
+        else {
+            miningName = null
+        }
+    }
+}
+
+function mineBlockAt(position) {
+    mining = position
+    bot.moveTo(position)
+    bot.substate = 'moving'
+}
+
+function mineBlock(name, count = 1) {
+    bot.state = 'mining'
+    miningCount = count
+    miningName = name
+}
+
+function stopMining() {
+    mining = false
+    miningCount = 0
+    miningName = null
+    bot.stopMoving()
+    bot.stopDigging()
+    if (bot.state === 'mining') {
+        bot.state = 'idle'
+        bot.substate = 'none'
+    }
+}
+
 // Vehicle
 // TODO: Vehicle movement
 

@@ -1,4 +1,5 @@
 const mineflayer = require('mineflayer')
+const toolPlugin = require('mineflayer-tool').plugin
 const armorManager = require('mineflayer-armor-manager')
 
 let bot
@@ -17,6 +18,7 @@ function createBot(options) {
 
     // Loading plugins
     bot.loadPlugin(armorManager)
+    bot.loadPlugin(toolPlugin)
 
     // Applying listeners
     bot.on('physicTick', onTick)
