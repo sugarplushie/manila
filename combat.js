@@ -73,14 +73,21 @@ var isShieldActive = false
 // Pew pew
 
 var attackHits = 0
+var mvTick = 0
 
 function checkForTargets() {
     const filter = e => targets.includes(e.username) || targets.includes(e.name)// && bot.entity.position.distanceTo(e.position) < 16
 
     const entity = bot.nearestEntity(filter)
-    const minimumDistance = 6
+    const minimumDistance = 5.5
 
     if (entity) {
+        attackTick += 1
+        mvTick += 1
+        if (mvTick > 10) {
+            mvTick = 0
+            bot.moveTo(entity.position)
+        }
         /*
         If it finds a valid target
         it will enter combat bot.state
@@ -113,7 +120,6 @@ function checkForTargets() {
             }
 
             bot.lookAt(entity.position)
-            bot.moveTo(entity.position)
             bot.substate = 'moving'
 
             /*
@@ -121,7 +127,7 @@ function checkForTargets() {
             main weapon to axe, useful when fighting
             targets that posses shields.
 
-            Also, if the target is far, the bot will 
+            Also, if the target is far, the bot will
             also equip an axe, as it has enough time
             to charge it.
 
@@ -142,11 +148,7 @@ function checkForTargets() {
             }
             bot.setControlState('sprint', true)
             if (entity.position.distanceTo(bot.entity.position) < minimumDistance) {
-                attackTick += 1
                 bot.setControlState('back', true)
-            }
-            else {
-                attackTick = 0
             }
 
             /*
@@ -165,7 +167,7 @@ function checkForTargets() {
             tick, getting a critical hit
             */
             if (attackTick > ticksPerAttack && entity.position.distanceTo(bot.entity.position) < minimumDistance) {
-                bot.stopDigging()
+                //bot.stopDigging()
                 attackTick = 0      // Reseting ticks
                 bot.setControlState('sprint', false)
                 bot.attack(entity)
@@ -214,14 +216,16 @@ function checkForTargets() {
                 }
             }
         }
-    } else if (bot.state === 'combat') {
-        bot.state = 'idle'
-        bot.substate = 'none'
+    } else {
+        if (bot.state === 'combat') {
+          bot.state = 'idle'
+          bot.substate = 'none'
 
-        if (isShieldActive) {
-            isShieldActive = false
-            bot.deactivateItem(true);
-        }
+          if (isShieldActive) {
+              isShieldActive = false
+              bot.deactivateItem(true);
+          }
+      }
     }
     eatTick += 1
 }
