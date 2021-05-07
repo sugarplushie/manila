@@ -39,7 +39,7 @@ function eat() { // Based on mineflayer-auto-eat
     /*
     Searches for any food items in the inventory
     to select it, then eat
-    
+
     Does not cherrypick atm (also i gotta make it do)
 
     Returns either it found food in the inventory
@@ -67,7 +67,7 @@ function eat() { // Based on mineflayer-auto-eat
         if (available_food[0]) {
             /*
             Passing food item to main hand
-            and activating the item from 
+            and activating the item from
             main hand (which is food)
             */
             bot.equip(available_food[0], 'hand')
@@ -101,7 +101,9 @@ function locateBlock(name) {
         maxDistance: 128,
         count: 1
     })
-    if (blocks.length > 0) return blocks[0].position
+    if (blocks.length > 0) {
+        return blocks[0].position
+    }
     return null
 }
 
@@ -110,23 +112,19 @@ var miningCount = 0
 var miningName = null
 
 function miningTick() {
-    if (mining && !bot.targetDigBlock && bot.entity.position.distanceTo(mining) < 2) {
-        bot.lookAt(mining)
-        bot.stopMoving()
-        target = bot.blockAt(mining)
+    if (mining) bot.lookAt(mining)
+    if (mining && !bot.targetDigBlock && bot.canDigBlock(bot.blockAt(mining))) {
         function finishedMining(err) {
-            if (err) {
-                //bot.stopDigging()
-                //console.log(err.stack)
-            }
-            //bot.stopDigging()
+            bot.stopMoving()
             mining = false
             miningCount -= 1
-            if (miningCount == 0) bot.chat(`Finished mining ${miningName}`)
-            //mineBlockAt()
         }
-        bot.substate = 'digging'
-        bot.tool.equipForBlock(target, {}, () => { bot.dig(target, finishedMining) })
+
+        target = bot.blockAt(mining)
+        bot.tool.equipForBlock(target, {}, () => {
+            bot.substate = 'digging'
+            bot.dig(target, finishedMining)
+        })
     }
     else if (!mining && miningName && miningCount > 0) {
         position = bot.locateBlock(miningName)
