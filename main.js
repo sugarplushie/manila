@@ -12,7 +12,7 @@ bot = manila.createBot(
     {
       username: process.argv[2],
       host: 'localhost',
-      port: 43067,
+      port: 42521,
     }
 )
 
@@ -186,6 +186,11 @@ function onChatMessage(username, message, rawMessage, jsonMsg) {
         bot.addTarget(args[1])
         response = [1, 'Target added!']
       }
+      break;
+
+    case 'inventory':
+      const invArray = bot.inventory.items().map(a => a.name)
+      response = [0, 'Current invetory state: ' + invArray.toString().split(',').join(', ') + '.']
       break;
 
     case 'drop':
