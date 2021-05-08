@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "mineflayer-armor-manager": "^1.4.1",
+    "mineflayer-blockfinder": "^0.0.7",
+    "mineflayer-pathfinder": "^1.6.1",
+    "mineflayer-tool": "^1.1.0"
+  }
+}
