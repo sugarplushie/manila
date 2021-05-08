@@ -269,15 +269,18 @@ function onChatMessage(username, message, rawMessage, jsonMsg) {
 }
 
 function onSpawn() {
-    // ..
+  // ...
 }
 
 function onLogin() {
-    // ...
+  (function eatingLoop() {
+    if (bot.state !== 'combat') bot.eat()
+    setTimeout(eatingLoop, 5000);
+  })();
 }
 
 function onTick() {
-    // ...
+  // ...
 }
 
 bot.once('spawn', onLogin)

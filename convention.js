@@ -1,3 +1,5 @@
+lodash = require('lodash')
+
 let bot
 
 function load(botclass) {
@@ -35,19 +37,32 @@ function hasFood() {
     return true
 }
 
-function eat() { // Based on mineflayer-auto-eat
+function eat() {
     /*
-    Searches for any food items in the inventory
-    to select it, then eat
+    From github.com/LINKdiscordd/mineflayer-auto-eat
 
-    Does not cherrypick atm (also i gotta make it do)
+    MIT License
+
+    Copyright (c) 2020 Link
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
     Returns either it found food in the inventory
     or not (bool)
     */
     const mcData = require('minecraft-data')(bot.version)
     var data = mcData.foodsArray
+
     var names = data.map((item) => item.name)
+    var foodps = data.map((item) => item.foodPoints)
 
     var found_food = bot.inventory
         .items()
@@ -60,20 +75,30 @@ function eat() { // Based on mineflayer-auto-eat
     var available_food = []
 
     bot.inventory.items().forEach((element) => {
-        if (names.includes(element.name)) available_food.push(element)
+        if (names.includes(element.name)) {
+            element.foodPoints = foodps[names.indexOf(element.name)] // item does not contain foodPoints by default
+            available_food.push(element)
+        }
     })
 
-    if (available_food.length > 0) {
-        if (available_food[0]) {
-            /*
-            Passing food item to main hand
-            and activating the item from
-            main hand (which is food)
-            */
-            bot.equip(available_food[0], 'hand')
-            bot.activateItem(false)
-            return true
-        }
+    var best_food
+		best_food = lodash.maxBy(available_food, 'foodPoints')
+
+    if (best_food) {
+        /*
+        Passing food item to main hand
+        and activating the item from
+        main hand (which is food)
+        */
+        bot.substate = 'eating'
+        //console.log(best_food)
+        //console.log(available_food)
+        bot.equip(best_food, 'hand', function () {
+            bot.consume(function () {
+              bot.substate = 'none'
+            })
+        })
+        return true
     }
 
     return false
