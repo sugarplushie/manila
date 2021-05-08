@@ -76,7 +76,7 @@ var attackHits = 0
 var mvTick = 0
 
 function checkForTargets() {
-    const filter = e => targets.includes(e.username) || targets.includes(e.name)// && bot.entity.position.distanceTo(e.position) < 16
+    const filter = e => targets.includes(e.username) || targets.includes(e.name)
 
     const entity = bot.nearestEntity(filter)
     const minimumDistance = 5.5
@@ -100,9 +100,7 @@ function checkForTargets() {
             either is in good stat conditions
             or does not have any food to
             metigate the stats
-            */
-
-            /*
+            
             Gets cooldown in ticks for the
             current weapon and uses it to
             time the attacks properly
@@ -156,15 +154,14 @@ function checkForTargets() {
             get a critical hit in the next 10 ticks
             */
             if (attackTick > ticksPerAttack - 10 && entity.position.distanceTo(bot.entity.position) < minimumDistance) {
-                //bot.stopDigging()
                 bot.setControlState('jump', false)
                 bot.setControlState('forward', true)
                 bot.substate = 'attacking'
             }
 
             /*
-            Perform the attack at the perfect cooldown
-            tick, getting a critical hit
+            Perform the attack at the proper tick
+            for current weapon cooldown
             */
             if (attackTick > ticksPerAttack && entity.position.distanceTo(bot.entity.position) < minimumDistance) {
                 //bot.stopDigging()
@@ -208,11 +205,9 @@ function checkForTargets() {
                     bot.setControlState('forward', true)
                     bot.setControlState('jump', true)
                     bot.setControlState('sprint', true)
-                    if (true) {//entity === null || entity.position.distanceTo(bot.entity.position) > 8) {
-                        bot.substate = 'eating'
-                        bot.eat()
-                        eatTick = 0
-                    }
+                    bot.substate = 'eating'
+                    bot.eat()
+                    eatTick = 0
                 }
             }
         }
