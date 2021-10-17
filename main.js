@@ -256,8 +256,8 @@ function onChatMessage(username, message, rawMessage, jsonMsg) {
     case 'remember':
       if(requireargs(2))
       {
-        memory[args[1]] = args[2];
-        response = [1, 'Sucessfuly saved {args[1]} as {args[2]}!'.format()]
+        memory[args[1]] = args.slice(2,args.length).join(' ');
+        response = [1, 'Sucessfuly saved {args[1]} as {args.slice(2, args.length).join(" ")}!'.format()]
       }
       break;
 
