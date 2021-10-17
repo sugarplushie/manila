@@ -1,4 +1,5 @@
 manila = require('./manila.js')
+memory = {}
 
 prefix = '#'
 
@@ -66,6 +67,13 @@ function goto(args) {
   }
 }
 
+String.prototype.format = function () {
+  var i = 0
+  return this.replace(/{}/g, function () {
+    return typeof memory[i] != 'undefined' ? memory[i++] : '';
+  });
+};
+
 function onChatMessage(username, message, rawMessage, jsonMsg) {
   try {username = jsonMsg.with[0].text} catch {}
   if (message[0] !== prefix) return
@@ -78,7 +86,7 @@ function onChatMessage(username, message, rawMessage, jsonMsg) {
     return
   }
 
-  message = message.slice(1)
+  message = message.format().slice(1)
   const args = message.split(' ')
 
   function requireargs(n) {
@@ -244,7 +252,22 @@ function onChatMessage(username, message, rawMessage, jsonMsg) {
         }
       }
       break;
+    
+    case 'remember':
+      if(requireargs(2))
+      {
+        memory[args[1]] = args[2];
+        response = [1, 'Sucessfuly saved {args[1]} as {args[2]}!'.format()]
+      }
+      break;
 
+    case 'valueof':
+      if(requireargs(1))
+      {
+        response = [1, memory[args[1]]]
+      }
+      break;
+      
     default:
       response = [2, 'This is not a valid command!']
       break;
